@@ -21,10 +21,11 @@ import os
 import socket
 import ssl
 import time
+import json
 from urllib import request
 
 from ffplayout.filters import build_filtergraph
-from ffplayout.utils import (MediaProbe, _playlist, gen_filler, get_date,
+from ffplayout.utils import (MediaProbe,_playout,_playlist, gen_filler, get_date,
                              get_delta, get_time, is_float, messenger,
                              stdin_args, timed_source, valid_json,
                              validate_thread)
@@ -217,6 +218,10 @@ class GetSourceFromPlaylist:
         self.get_category(index, node)
         self.set_filtergraph()
         self.check_for_next_playlist()
+        if _playout.on_track_change:
+            command = _playout.on_track_change +" '" + json.dumps(node) + "'";
+            messenger.info(command);
+            os.system(command);
 
     def next(self):
         while True:

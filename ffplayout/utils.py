@@ -229,6 +229,10 @@ def load_config():
         _playout.stream_output = cfg['out']['stream_output'].split(' ')
         _playout.hls_output = cfg['out']['hls_output'].split(' ')
 
+        _playout.on_track_change = None
+        if 'on_track_change' in cfg['out']:
+            _playout.on_track_change = cfg['out']['on_track_change']
+
         _init.load = False
 
 
@@ -457,7 +461,7 @@ def is_in_system(name):
     """
     Check whether name is on PATH and marked as executable
     """
-    
+
     if which(name) is None:
         messenger.error('{} is not found on system'.format(name))
         exit()
