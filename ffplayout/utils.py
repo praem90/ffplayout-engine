@@ -53,10 +53,6 @@ stdin_parser.add_argument(
 )
 
 stdin_parser.add_argument(
-    '-d', '--desktop', help='preview on desktop', action='store_true'
-)
-
-stdin_parser.add_argument(
     '-f', '--folder', help='play folder content'
 )
 
@@ -66,6 +62,10 @@ stdin_parser.add_argument(
 
 stdin_parser.add_argument(
     '-i', '--loop', help='loop playlist infinitely', action='store_true'
+)
+
+stdin_parser.add_argument(
+    '-m', '--mode', help='set output mode: desktop, hls, stream'
 )
 
 stdin_parser.add_argument(
@@ -122,6 +122,7 @@ _playout = SimpleNamespace()
 
 _init = SimpleNamespace(load=True)
 _ff = SimpleNamespace(decoder=None, encoder=None)
+_current = SimpleNamespace(clip=None)
 _global = SimpleNamespace(time_delta=0)
 
 
@@ -461,10 +462,9 @@ def is_in_system(name):
     """
     Check whether name is on PATH and marked as executable
     """
-
     if which(name) is None:
         messenger.error('{} is not found on system'.format(name))
-        exit()
+        sys.exit(1)
 
 
 def ffmpeg_libs():
@@ -510,10 +510,6 @@ def validate_ffmpeg_libs():
     if 'libfdk-aac' not in FF_LIBS['libs']:
         playout_logger.warning(
             'ffmpeg contains no libfdk-aac! No high quality aac...')
-    if 'libtwolame' not in FF_LIBS['libs']:
-        playout_logger.warning(
-            'ffmpeg contains no libtwolame!'
-            ' Loudness correction use mp2 audio codec...')
     if 'tpad' not in FF_LIBS['filters']:
         playout_logger.error('ffmpeg contains no tpad filter!')
     if 'zmq' not in FF_LIBS['filters']:
@@ -1019,7 +1015,6 @@ def pre_audio_codec():
     and works not well together with the loudnorm filter
     """
     if _pre.add_loudnorm:
-        acodec = 'libtwolame' if 'libtwolame' in FF_LIBS['libs'] else 'mp2'
-        return ['-c:a', acodec, '-b:a', '384k', '-ar', '48000', '-ac', '2']
+        return ['-c:a', 'mp2', '-b:a', '384k', '-ar', '48000', '-ac', '2']
     else:
         return ['-c:a', 's302m', '-strict', '-2', '-ar', '48000', '-ac', '2']

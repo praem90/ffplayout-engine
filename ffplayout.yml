@@ -105,6 +105,7 @@ out:
     mode: 'stream'
     service_name: "Live Stream"
     service_provider: "example.org"
+    on_track_change: "echo "
     ffmpeg_param: >-
         -c:v libx264
         -crf 23
